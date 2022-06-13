@@ -7,7 +7,7 @@ import jwt
 
 from NagiosResponse import NagiosResponse
 
-nagios = NagiosResponse("Refresh token valid.")
+nagios = NagiosResponse()
 
 
 class TimeoutError(Exception):
@@ -31,20 +31,40 @@ class timeout:
 
 
 def validate_token(args):
+    date_format = "%b %d %Y %H:%M:%S"
     try:
         unix_time = jwt.decode(args.token, verify=False)["exp"]
         expiration_time = datetime.datetime.fromtimestamp(unix_time)
         timedelta = expiration_time - datetime.datetime.today()
 
-        if 15 < timedelta.days < 30:
-            nagios.writeWarningMessage(
-                "Refresh token expiring in %d days!" % timedelta.days
-            )
-            nagios.setCode(nagios.WARNING)
+        if timedelta.total_seconds() > 0:
+            if 15 <= timedelta.days < 30:
+                nagios.writeWarningMessage(
+                    "Refresh token will expire in %d days on %s" % (
+                        timedelta.days, expiration_time.strftime(date_format)
+                    )
+                )
+                nagios.setCode(nagios.WARNING)
 
-        if timedelta.days < 15:
+            elif 0 <= timedelta.days < 15:
+                nagios.writeCriticalMessage(
+                    "Refresh token will expire in %d days on %s" % (
+                        timedelta.days, expiration_time.strftime(date_format)
+                    )
+                )
+                nagios.setCode(nagios.CRITICAL)
+
+            else:
+                nagios.writeOkMessage(
+                    "Refresh token valid until %s" % (
+                        expiration_time.strftime(date_format)
+                    )
+                )
+
+        else:
             nagios.writeCriticalMessage(
-                "Refresh token expiring in %d days!" % timedelta.days
+                "Refresh token is expired (was valid until %s)" %
+                expiration_time.strftime(date_format)
             )
             nagios.setCode(nagios.CRITICAL)
 

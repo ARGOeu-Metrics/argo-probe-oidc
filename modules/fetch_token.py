@@ -1,46 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import argparse
 import grp
 import os
 import pwd
-import sys
 
 import requests
 
-from NagiosResponse import NagiosResponse
+from argo_probe_oidc.NagiosResponse import NagiosResponse
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Nagios probe for fetching OIDC tokens."
-    )
-    parser.add_argument(
-        "-u", "--url", dest="url", type=str,
-        default="https://aai.egi.eu/oidc/token",
-        help="URL from which the token is fetched"
-    )
-    parser.add_argument(
-        "--client_id", dest="client_id", type=str, required=True,
-        help="The identifier of the client"
-    )
-    parser.add_argument(
-        "--client_secret", dest="client_secret", type=str, required=True,
-        help="The secret value of the client"
-    )
-    parser.add_argument(
-        "--refresh_token", dest="refresh_token", type=str, required=True,
-        help="The value of the refresh token"
-    )
-    parser.add_argument(
-        "--token_file", dest="token_file", type=str,
-        default="/etc/nagios/globus/oidc",
-        help="File for storing obtained token"
-    )
-    parser.add_argument(
-        "-t", "--timeout", dest="timeout", type=int, default=60,
-        help="timeout"
-    )
-    args = parser.parse_args()
+def utils(args):
 
     nagios = NagiosResponse("Access token fetched successfully.")
 
@@ -57,6 +26,7 @@ def main():
             },
             timeout=args.timeout
         )
+
         response.raise_for_status()
 
         access_token = response.json()["access_token"]
@@ -70,8 +40,8 @@ def main():
         except KeyError:
             nagios.writeCriticalMessage("No user named 'nagios'")
             nagios.setCode(nagios.CRITICAL)
-            print nagios.getMsg()
-            sys.exit(nagios.getCode())
+            print(nagios.getMsg())
+            raise SystemExit(nagios.getCode())
 
         try:
             gid = grp.getgrnam("nagios").gr_gid
@@ -79,37 +49,50 @@ def main():
         except KeyError:
             nagios.writeCriticalMessage("No group named 'nagios'")
             nagios.setCode(nagios.CRITICAL)
-            print nagios.getMsg()
-            sys.exit(nagios.getCode())
+            print(nagios.getMsg())
+            raise SystemExit(nagios.getCode())
 
         os.chown(args.token_file, uid, gid)
+        print(nagios.getMsg())
+        raise SystemExit(nagios.getCode())
 
-        print nagios.getMsg()
-        sys.exit(nagios.getCode())
-
-    except (
-            requests.exceptions.HTTPError,
-            requests.exceptions.ConnectionError,
-            requests.exceptions.RequestException,
-            ValueError,
-            KeyError
-    ) as e:
+    except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.RequestException, ValueError, KeyError) as e:
         nagios.writeCriticalMessage(str(e))
         nagios.setCode(nagios.CRITICAL)
-        print nagios.getMsg()
-        sys.exit(nagios.getCode())
+        print(nagios.getMsg())
+        raise SystemExit(nagios.getCode())
 
     except IOError as e:
         nagios.writeCriticalMessage("Error creating file: " + str(e))
         nagios.setCode(nagios.CRITICAL)
-        print nagios.getMsg()
-        sys.exit(nagios.getCode())
+        print(nagios.getMsg())
+        raise SystemExit(nagios.getCode())
 
     except Exception as e:
         nagios.writeCriticalMessage(str(e))
         nagios.setCode(nagios.CRITICAL)
-        print nagios.getMsg()
-        sys.exit(nagios.getCode())
+        print(nagios.getMsg())
+        raise SystemExit(nagios.getCode())
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Nagios probe for fetching OIDC tokens.")
+    parser.add_argument("-u", "--url", dest="url", type=str,
+                        default="https://aai.egi.eu/oidc/token", help="URL from which the token is fetched")
+    parser.add_argument("--client_id", dest="client_id", type=str,
+                        required=True, help="The identifier of the client")
+    parser.add_argument("--client_secret", dest="client_secret",
+                        type=str, required=True, help="The secret value of the client")
+    parser.add_argument("--refresh_token", dest="refresh_token",
+                        type=str, required=True, help="The value of the refresh token")
+    parser.add_argument("--token_file", dest="token_file", type=str,
+                        default="/etc/nagios/globus/oidc", help="File for storing obtained token")
+    parser.add_argument("-t", "--timeout", dest="timeout",
+                        type=int, default=60, help="timeout")
+
+    arguments = parser.parse_args()
+    utils(args=arguments)
 
 
 if __name__ == "__main__":

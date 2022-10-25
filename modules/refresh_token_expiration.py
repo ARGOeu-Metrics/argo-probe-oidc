@@ -5,7 +5,7 @@ import sys
 
 import jwt
 
-from NagiosResponse import NagiosResponse
+from argo_probe_oidc.NagiosResponse import NagiosResponse
 
 nagios = NagiosResponse()
 
@@ -68,13 +68,13 @@ def validate_token(args):
             )
             nagios.setCode(nagios.CRITICAL)
 
-        print nagios.getMsg()
+        print (nagios.getMsg())
 
     except jwt.exceptions.DecodeError as e:
-        print "UNKNOWN - Token is malformed: %s" % str(e)
+        print ("UNKNOWN - Token is malformed: %s" % str(e))
 
     except Exception as e:
-        print "UNKNOWN - %s" % str(e)
+        print ("UNKNOWN - %s" % str(e))
 
         nagios.setCode(nagios.UNKNOWN)
 

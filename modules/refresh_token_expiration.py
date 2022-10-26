@@ -1,7 +1,6 @@
 import argparse
 import datetime
 import signal
-import sys
 
 import jwt
 
@@ -33,64 +32,53 @@ class timeout:
 def validate_token(args):
     date_format = "%b %d %Y %H:%M:%S"
     try:
-        unix_time = jwt.decode(args.token, verify=False)["exp"]
+        unix_time = jwt.decode(args.token, options={
+                               "verify_signature": False})["exp"]
+
         expiration_time = datetime.datetime.fromtimestamp(unix_time)
+
         timedelta = expiration_time - datetime.datetime.today()
 
         if timedelta.total_seconds() > 0:
             if 15 <= timedelta.days < 30:
                 nagios.writeWarningMessage(
-                    "Refresh token will expire in %d days on %s" % (
-                        timedelta.days, expiration_time.strftime(date_format)
-                    )
-                )
+                    f"Refresh token will expire in {timedelta.days} days on {expiration_time.strftime(date_format)}")
                 nagios.setCode(nagios.WARNING)
 
             elif 0 <= timedelta.days < 15:
                 nagios.writeCriticalMessage(
-                    "Refresh token will expire in %d days on %s" % (
-                        timedelta.days, expiration_time.strftime(date_format)
-                    )
-                )
+                    f"Refresh token will expire in {timedelta.days} days on {expiration_time.strftime(date_format)}")
                 nagios.setCode(nagios.CRITICAL)
 
             else:
                 nagios.writeOkMessage(
-                    "Refresh token valid until %s" % (
-                        expiration_time.strftime(date_format)
-                    )
-                )
+                    f"Refresh token valid until {expiration_time.strftime(date_format)}")
 
         else:
             nagios.writeCriticalMessage(
-                "Refresh token is expired (was valid until %s)" %
-                expiration_time.strftime(date_format)
-            )
+                f"Refresh token is expired (was valid until {expiration_time.strftime(date_format)})")
             nagios.setCode(nagios.CRITICAL)
 
-        print (nagios.getMsg())
+        print(nagios.getMsg())
 
     except jwt.exceptions.DecodeError as e:
-        print ("UNKNOWN - Token is malformed: %s" % str(e))
-
-    except Exception as e:
-        print ("UNKNOWN - %s" % str(e))
-
+        print(f"UNKNOWN - Token is malformed: {str(e)}")
         nagios.setCode(nagios.UNKNOWN)
 
-    sys.exit(nagios.getCode())
+    except Exception as e:
+        print(f"UNKNOWN - {str(e)}")
+        nagios.setCode(nagios.UNKNOWN)
+
+    raise SystemExit(nagios.getCode())
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Nagios probe for checking refresh token expiration"
-    )
-    parser.add_argument(
-        "--token", dest="token", type=str, required=True, help="Refresh token"
-    )
-    parser.add_argument(
-        "-t", "--timeout", dest="timeout", type=int, default=5, help="timeout"
-    )
+        description="Nagios probe for checking refresh token expiration")
+    parser.add_argument("--token", dest="token", type=str,
+                        required=True, help="Refresh token")
+    parser.add_argument("-t", "--timeout", dest="timeout",
+                        type=int, default=5, help="timeout")
     args = parser.parse_args()
 
     with timeout(seconds=args.timeout):

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import argparse
 import grp
 import os
@@ -6,8 +5,7 @@ import pwd
 import sys
 
 import requests
-
-from NagiosResponse import NagiosResponse
+from argo_probe_oidc.NagiosResponse import NagiosResponse
 
 
 def main():
@@ -70,7 +68,7 @@ def main():
         except KeyError:
             nagios.writeCriticalMessage("No user named 'nagios'")
             nagios.setCode(nagios.CRITICAL)
-            print nagios.getMsg()
+            print(nagios.getMsg())
             sys.exit(nagios.getCode())
 
         try:
@@ -79,12 +77,12 @@ def main():
         except KeyError:
             nagios.writeCriticalMessage("No group named 'nagios'")
             nagios.setCode(nagios.CRITICAL)
-            print nagios.getMsg()
+            print(nagios.getMsg())
             sys.exit(nagios.getCode())
 
         os.chown(args.token_file, uid, gid)
 
-        print nagios.getMsg()
+        print(nagios.getMsg())
         sys.exit(nagios.getCode())
 
     except (
@@ -96,19 +94,19 @@ def main():
     ) as e:
         nagios.writeCriticalMessage(str(e))
         nagios.setCode(nagios.CRITICAL)
-        print nagios.getMsg()
+        print(nagios.getMsg())
         sys.exit(nagios.getCode())
 
     except IOError as e:
         nagios.writeCriticalMessage("Error creating file: " + str(e))
         nagios.setCode(nagios.CRITICAL)
-        print nagios.getMsg()
+        print(nagios.getMsg())
         sys.exit(nagios.getCode())
 
     except Exception as e:
         nagios.writeCriticalMessage(str(e))
         nagios.setCode(nagios.CRITICAL)
-        print nagios.getMsg()
+        print(nagios.getMsg())
         sys.exit(nagios.getCode())
 
 

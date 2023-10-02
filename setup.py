@@ -12,7 +12,7 @@ def get_ver():
             if "Version:" in line:
                 return line.split()[1]
     except IOError:
-        print "Make sure that %s is in directory"  % (NAME+'.spec')
+        print(f"Make sure that {NAME}.spec is in directory")
         sys.exit(1)
 
 
@@ -26,5 +26,5 @@ setup(name=NAME,
       url='http://argoeu.github.io/',
       data_files=[(NAGIOSPLUGINS, glob.glob('src/*'))],
       packages=['argo_probe_oidc'],
-      package_dir={'argo_probe_oidc': 'modules/'},
+      package_dir={'argo_probe_oidc': 'modules'},
       )

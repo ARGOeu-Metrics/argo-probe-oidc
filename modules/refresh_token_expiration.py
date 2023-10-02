@@ -82,7 +82,7 @@ def validate_token(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Nagios probe for checking refresh token expiration"
+        description="ARGO probe for checking refresh token expiration"
     )
     parser.add_argument(
         "--token", dest="token", type=str, required=True, help="Refresh token"

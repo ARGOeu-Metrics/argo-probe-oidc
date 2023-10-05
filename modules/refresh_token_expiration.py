@@ -4,8 +4,7 @@ import signal
 import sys
 
 import jwt
-
-from NagiosResponse import NagiosResponse
+from argo_probe_oidc.NagiosResponse import NagiosResponse
 
 nagios = NagiosResponse()
 
@@ -68,13 +67,13 @@ def validate_token(args):
             )
             nagios.setCode(nagios.CRITICAL)
 
-        print nagios.getMsg()
+        print(nagios.getMsg())
 
     except jwt.exceptions.DecodeError as e:
-        print "UNKNOWN - Token is malformed: %s" % str(e)
+        print("UNKNOWN - Token is malformed: %s" % str(e))
 
     except Exception as e:
-        print "UNKNOWN - %s" % str(e)
+        print("UNKNOWN - %s" % str(e))
 
         nagios.setCode(nagios.UNKNOWN)
 
@@ -83,7 +82,7 @@ def validate_token(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Nagios probe for checking refresh token expiration"
+        description="ARGO probe for checking refresh token expiration"
     )
     parser.add_argument(
         "--token", dest="token", type=str, required=True, help="Refresh token"

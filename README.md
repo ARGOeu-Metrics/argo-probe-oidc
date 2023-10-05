@@ -1,39 +1,42 @@
 # argo-probe-oidc
 
-The package contains metrics to handle OIDC tokens. There are two metrics:
+The package contains probe to handle OIDC tokens. There are two probes:
 
 * `fetch-access-token`
 * `check-refresh-token-expiration`
 
-The former is used for fetching the OIDC access token, and the latter is used to check the validity of the refresh token which is needed for fetching of the access token.
+`fetch-access-token` probe is used for fetching of OIDC access token. `check-refresh-token-expiration` probe is used to check the validity of refresh token needed for fetching the access token.
 
 ## Synopsis
 
 ### fetch-access-token
 
-The probe `fetch-access-token` has several arguments.
+The probe `fetch-access-token` has several arguments. `<CLIENT_ID>`, `<CLIENT_SECRET>`, and `<REFRESH_TOKEN>` arguments are mandatory, and the rest have default values (which can be overridden).
 
 ```
 # /usr/libexec/argo/probes/oidc/fetch-access-token --help
 usage: fetch-access-token [-h] [-u URL] --client_id CLIENT_ID --client_secret
                           CLIENT_SECRET --refresh_token REFRESH_TOKEN
-                          [--token_file TOKEN_FILE] [-t TIMEOUT]
+                          [--token_file TOKEN_FILE] [-U USER] [-t TIMEOUT]
 
-Nagios probe for fetching OIDC tokens.
+ARGO probe for fetching OIDC tokens.
 
 optional arguments:
   -h, --help            show this help message and exit
-  -u URL, --url URL     URL from which the token is fetched
+  -u URL, --url URL     URL from which the token is fetched (default:
+                        https://aai.egi.eu/oidc/token)
   --client_id CLIENT_ID
-                        The identifier of the client
+                        identifier of client
   --client_secret CLIENT_SECRET
-                        The secret value of the client
+                        secret value of client
   --refresh_token REFRESH_TOKEN
-                        The value of the refresh token
+                        refresh token
   --token_file TOKEN_FILE
-                        File for storing obtained token
+                        file for storing obtained token (default:
+                        /etc/nagios/globus/oidc)
+  -U USER, --user USER  username of user executing the probe (default: nagios)
   -t TIMEOUT, --timeout TIMEOUT
-                        timeout
+                        timeout in seconds (default: 60)
 ```
 
 Example execution of the probe:
@@ -51,7 +54,7 @@ The probe `check-refresh-token-expiration` has two arguments.
 # /usr/libexec/argo/probes/oidc/check-refresh-token-expiration --help
 usage: check-refresh-token-expiration [-h] --token TOKEN [-t TIMEOUT]
 
-Nagios probe for checking refresh token expiration
+ARGO probe for checking refresh token expiration
 
 optional arguments:
   -h, --help            show this help message and exit

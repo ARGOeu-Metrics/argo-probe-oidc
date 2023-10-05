@@ -3,7 +3,7 @@
 
 Name:      argo-probe-oidc
 Summary:   ARGO probes for handling of OIDC tokens.
-Version:   0.1.1
+Version:   0.2.0
 Release:   1%{?dist}
 License:   ASL 2.0
 Group:     Development/System
@@ -42,6 +42,8 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Oct 5 2023 Katarina Zailac <kzailac@srce.hr> - 0.2.0-1%{?dist}
+- ARGO-4389 Set username as parameter to probe fetching OIDC token
 * Thu Jun 30 2022 Katarina Zailac <kzailac@srce.hr> - 0.1.1-1%{?dist}
 - ARGO-3872 Improve probe return message when refresh token has expired
 * Thu Jun 9 2022 Katarina Zailac <kzailac@gmail.com> - 0.1.0-1%{?dist}

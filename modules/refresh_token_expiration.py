@@ -32,7 +32,16 @@ class timeout:
 def validate_token(args):
     date_format = "%b %d %Y %H:%M:%S"
     try:
-        unix_time = jwt.decode(args.token, verify=False)["exp"]
+        jwt_options = {
+            "verify_signature": False,
+            "verify_exp": True,
+            "verify_nbf": False,
+            "verify_iat": False,
+            "verify_aud": False
+        }
+        unix_time = jwt.decode(
+            args.token, algorithms=["HS256"], options=jwt_options
+        )["exp"]
         expiration_time = datetime.datetime.fromtimestamp(unix_time)
         timedelta = expiration_time - datetime.datetime.today()
 

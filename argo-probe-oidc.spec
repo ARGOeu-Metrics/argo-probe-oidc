@@ -50,7 +50,7 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Mon May 13 2024 Katarina Zailac <kzailac@srce.hr> - 0.2.1-1%{?dist}
+* Wed May 22 2024 Katarina Zailac <kzailac@srce.hr> - 0.2.1-1%{?dist}
 - ARGO-4547 Prepare el9 build for argo-probe-oidc
 * Thu Oct 5 2023 Katarina Zailac <kzailac@srce.hr> - 0.2.0-1%{?dist}
 - ARGO-4389 Set username as parameter to probe fetching OIDC token

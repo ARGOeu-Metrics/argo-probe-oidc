@@ -3,7 +3,7 @@
 
 Name:      argo-probe-oidc
 Summary:   ARGO probes for handling of OIDC tokens.
-Version:   0.2.0
+Version:   0.2.1
 Release:   1%{?dist}
 License:   ASL 2.0
 Group:     Development/System
@@ -13,8 +13,16 @@ Prefix:    %{_prefix}
 BuildArch: noarch
 
 BuildRequires: python3-devel
+
+%if 0%{?el7}
 Requires: python36-requests
 Requires: python36-jwt
+
+%else
+Requires: python3-requests
+Requires: python3-jwt
+
+%endif
 
 %description
 This package includes probes for fetching OIDC access token and checking refresh token validity.
@@ -42,6 +50,8 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed May 22 2024 Katarina Zailac <kzailac@srce.hr> - 0.2.1-1%{?dist}
+- ARGO-4547 Prepare el9 build for argo-probe-oidc
 * Thu Oct 5 2023 Katarina Zailac <kzailac@srce.hr> - 0.2.0-1%{?dist}
 - ARGO-4389 Set username as parameter to probe fetching OIDC token
 * Thu Jun 30 2022 Katarina Zailac <kzailac@srce.hr> - 0.1.1-1%{?dist}
